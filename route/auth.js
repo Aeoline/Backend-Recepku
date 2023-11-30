@@ -23,21 +23,35 @@ router.post('/register', (req, res)=>{
     .get()
     .then((doc)=>{
         if(doc.exists){
-            console.log(doc.data().username)
-            // console.log('username sudah terdaftar')
-            return res.status(500).send('username sudah terdaftar')
+            console.log(`username ${doc.data().username} sudah terdaftar`)
+            return res.status(500).json({
+                error: true,
+                message: `username ${doc.data().username} sudah terdaftar`
+            })
         } else if(data.username.length < 5){
             console.log('username harus lebih dari 5 karakter')
-            return res.status(500).send('username harus lebih dari 5 karakter')
+            return res.status(500).json({
+                error: true,
+                message: 'username harus lebih dari 5 karakter'
+            })
         } else if(data.username.length > 20){
             console.log('username harus kurang dari 20 karakter')
-            return res.status(500).send('username harus kurang dari 20 karakter')
+            return res.status(500).json({
+                error: true,
+                message: 'username harus kurang dari 20 karakter'
+            })
         } else if(data.password.length < 7){
             console.log('password harus lebih dari 7 karakter')
-            return res.status(500).send('password harus lebih dari 7 karakter')
-        } else if(data.email.length < 1){
-            console.log('email tidak boleh kosong')
-            return res.status(500).send('email tidak boleh kosong')
+            return res.status(500).json({
+                error: true,
+                message: 'password harus lebih dari 7 karakter'
+            })
+        } else if(!data.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)){
+            console.log('email tidak valid')
+            return res.status(500).json({
+                error: true,
+                message: 'email tidak valid'
+            })
         } else if(data.email.length > 0){
             db.collection('users')
             .where('email', '==', data.email)
@@ -56,28 +70,62 @@ router.post('/register', (req, res)=>{
                         })
                         .then(()=>{
                             console.log('User berhasil dibuat')
-                            return res.status(200).send('User berhasil dibuat')
+                            return res.status(200).json({
+                                error: false,
+                                message: 'User berhasil dibuat'
+                            })
                         })
                         .catch((error)=>{
                             console.log(error)
-                            return res.status(500).send(error)
+                            return res.status(500).json({
+                                error: true,
+                                message: error
+                            })
                         })
                     })
                 }else{
-                    console.log('email sudah terdaftar')
-                    return res.status(500).send('email sudah terdaftar')
+                    console.log(`email ${doc.docs[0].data().email} sudah terdaftar`)
+                    return res.status(500).json({
+                        error: true,
+                        message: `email ${doc.docs[0].data().email} sudah terdaftar`
+                    })
                 }
             })
             .catch((error)=>{
                 console.log(error)
-                return res.status(500).send(error)
+                return res.status(500).json({
+                    error: true,
+                    message: error
+                })
             })
         }
     })
     .catch((error)=>{
         console.log(error)
-        return res.status(500).send(error)
+        return res.status(500).json({
+            error: true,
+            message: error
+        })
     })
+})
+
+// route for get register info
+router.get('/register', (req, res)=>{
+    session = req.session
+    if(session.username){
+        console.log(session)
+        return res.status(200).json({
+            error: false,
+            message: 'User Created',
+            data: session
+        })
+    }else{
+        console.log('Not Found')
+        return res.status(200).json({
+            error: true,
+            message: 'Not Found'
+        })
+    }
 })
 
 // route for login username or email and password with validation
@@ -93,10 +141,17 @@ router.post('/login', (req, res)=>{
                     req.session.username = data.username
                     req.session.email = doc.data().email
                     console.log('Welcome ' + req.session.username)
-                    return res.status(200).send('Welcome ' + req.session.username)
+                    return res.status(200).json({
+                        error: false,
+                        message: 'Welcome ' + req.session.username,
+                        data: req.session
+                    })
                 }else{
                     console.log('password salah')
-                    return res.status(500).send('password salah')
+                    return res.status(500).json({
+                        error: true,
+                        message: 'password salah'
+                    })
                 }
             })
         }else{
@@ -113,27 +168,60 @@ router.post('/login', (req, res)=>{
                             req.session.username = doc.docs[0].data().username
                             req.session.email = doc.docs[0].data().email
                             console.log('Welcome ' + req.session.username)
-                            return res.status(200).send('Welcome ' + req.session.username)
+                            return res.status(200).json({
+                                error: false,
+                                message: 'Welcome ' + req.session.username,
+                                data: req.session
+                            })
                         }else{
                             console.log('password salah')
-                            return res.status(500).send('password salah')
+                            return res.status(500).json({
+                                error: true,
+                                message: 'password salah'
+                            })
                         }
                     })
                 }
             })
             .catch((error)=>{
                 console.log(error)
-                return res.status(500).send(error)
+                return res.status(500).json({
+                    error: true,
+                    message: error
+                })
             })
         }
     })
     .catch((error)=>{
         console.log(error)
-        return res.status(500).send(error)
+        return res.status(500).json({
+            error: true,
+            message: error
+        })
     })
 })
 
-// // route for login username or email and password with validation 
+// get login info
+router.get('/login', (req, res)=>{
+    session = req.session
+    if(session.username){
+        console.log(session)
+        return res.status(200).json({
+            error: false,
+            message: 'Authentication success',
+            data: session
+        })
+    }else{
+        console.log('Authentication failed the user is not logged in')
+        return res.status(500).json({
+            error: true,
+            message: 'Authentication failed the user is not logged in'
+
+        })
+    }
+})
+
+// route for login username or email and password with validation 
 // router.post('/login', (req, res)=>{
 //     db.settings({
 //         timestampsInSnapshots: true
@@ -170,10 +258,17 @@ router.get('/user', (req, res)=>{
     session = req.session
     if(session.username){
         console.log(session)
-        return res.status(200).send(session)
+        return res.status(200).json({
+            error: false,
+            message: 'Authentication success',
+            data: session
+        })
     }else{
         console.log('Authentication failed the user is not logged in')
-        return res.status(200).send('Authentication failed the user is not logged in')
+        return res.status(200).json({
+            error: true,
+            message: 'Authentication failed the user is not logged in'
+        })
     }
 })
 
