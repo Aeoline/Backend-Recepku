@@ -27,10 +27,16 @@ app.use(cookieParser());
 app.get('/', (req, res)=>{
     session = req.session
     if(session.username){
-        res.send('Welcome ' + session.username)
+        res.json({
+            message: 'Welcome ' + session.username,
+            data: session
+        })
     }
     else{
-        res.send('Welcome Guest')
+        res.json({
+            message: 'Welcome guest',
+            // data: session
+        })
     }
 })
 
