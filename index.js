@@ -26,7 +26,7 @@ app.use(cookieParser());
 // routes
 app.get('/', (req, res)=>{
     session = req.session
-    if(session.username){
+    if (session.uid) {
         res.json({
             message: 'Welcome ' + session.username,
             data: session
@@ -35,17 +35,22 @@ app.get('/', (req, res)=>{
     else{
         res.json({
             message: 'Welcome guest',
-            // data: session
+            data: session
         })
     }
 })
-
+// auth route
 var auth = require('./route/auth')
 app.use(auth)
+// profile route
+var profile = require('./route/profile')
+app.use(profile)
+// makanan route
+var makanan = require('./route/makanan')
+app.use(makanan)
 
 // server
 var port = process.env.PORT || 3000
 app.listen(port, ()=>{
     console.log('Server berjalan di port ' + port)
 })
-
