@@ -3,6 +3,7 @@ var fire = require('../config/dbConfig')
 var bodyParser = require('body-parser')
 var bycript = require('bcryptjs')
 var db = fire.firestore()
+router.use(bodyParser.json())
 router.use(bodyParser.urlencoded({extended: true}))
 const { v4: uuidv4 } = require('uuid');
 
