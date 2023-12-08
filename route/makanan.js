@@ -48,5 +48,26 @@ router.get('/makanan/:nama_makanan', (req, res)=>{
     })
 })
 
+// get makanan by highiest search_record from database makanan  (top 5)
+// router.get('/makanan/top', (req, res)=>{
+//     var makanan = []
+//     db.collection('makanan').orderBy('search_record', 'desc').limit(5).get()
+//     .then((snapshot)=>{
+//         snapshot.forEach((doc)=>{
+//             makanan.push(doc.data())
+//         })
+//         res.json({
+//             message: 'success',
+//             data: makanan
+//         })
+//     })
+//     .catch((err)=>{
+//         res.json({
+//             message: 'error',
+//             data: err
+//         })
+//     })
+// })
+
 // export router
 module.exports = router
