@@ -3,6 +3,7 @@ var fire = require('../config/dbConfig')
 var bodyParser = require('body-parser')
 var db = fire.firestore()
 router.use(bodyParser.json())
+router.use(bodyParser.urlencoded({ extended: true }))
 
 // get all makanan
 router.get('/makanan', (req, res)=>{
