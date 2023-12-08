@@ -1,6 +1,7 @@
 var express = require('express')
 var bodyParser = require('body-parser')
 var cors = require('cors')
+app.use(bodyParser.urlencoded({ extended: true }))
 
 // express app
 var app = express()
@@ -13,7 +14,7 @@ var session = require('express-session')
 var oneWeek = 1000 * 60 * 60 * 24 * 7
 app.set('trust proxy', 1) // trust first proxy
 app.use(session({
-    secret: 'MyLovelyRaidenShogun',
+    secret: 'MyLovelyYaeMiko',
     resave: false,
     saveUninitialized: true,
     cookie: { maxAge: oneWeek }
