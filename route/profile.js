@@ -4,6 +4,7 @@ var bodyParser = require('body-parser')
 var bycript = require('bcryptjs')
 var db = fire.firestore()
 router.use(bodyParser.json())
+router.use(bodyParser.urlencoded({ extended: true }))
 
 // route for get profile by session
 router.get('/profile', (req, res)=>{
