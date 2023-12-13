@@ -3,9 +3,9 @@ var fire = require('../config/dbConfig')
 var bodyParser = require('body-parser')
 var bycript = require('bcryptjs')
 var db = fire.firestore()
+const { v4: uuidv4 } = require('uuid');
 router.use(bodyParser.json())
 router.use(bodyParser.urlencoded({extended: true}))
-const { v4: uuidv4 } = require('uuid');
 
 // timestamp
 db.settings({
@@ -17,24 +17,38 @@ function convertTZ(date, tzString) {
     return new Date((typeof date === "string" ? new Date(date) : date).toLocaleString("en-US", {timeZone: tzString}));   
 }
 
+// generate uuid
+function generateID (){
+    var uid = uuidv4()
+    db.collection('users')
+    .where('uid', '==', uid)
+    .get()
+    .then((doc)=>{
+        if(doc.empty){
+            console.log(uid)
+            return uid
+        }else{
+            generateID()
+        }
+    })
+}
+
 // route for register username and hashed password with validation
 router.post('/register', (req, res)=>{
     var data = req.body
+    
+    // generate uuid
     var uid = uuidv4()
-
-    // // check uid is available
-    // while(true){
-    //     db.collection('users')
-    //     .where('uid', '==', uid)
-    //     .get()
-    //     .then((doc)=>{
-    //         if(doc.empty){
-    //             return uid
-    //         }else{
-    //             uid = uuidv4()
-    //         }
-    //     })
-    // }
+    db.collection('users')
+    .where('uid', '==', uid)
+    .get()
+    .then((doc)=>{
+        if(doc.empty){
+            uid = uid
+        }else{
+            uid = generateID()
+        }
+    })
 
     // add user to database
     db.collection('users')
