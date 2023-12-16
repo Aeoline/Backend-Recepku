@@ -5,6 +5,15 @@ var bycript = require('bcryptjs')
 var db = fire.firestore()
 router.use(bodyParser.json())
 router.use(bodyParser.urlencoded({ extended: true }))
+const Multer = require('multer')
+
+// image upload
+const imgUpload = require('../config/imgUpload')
+
+const multer = Multer({
+    storage: Multer.MemoryStorage,
+    fileSize: 5 * 1024 * 1024
+})
 
 // route for get profile by session
 router.get('/profile', (req, res)=>{
@@ -61,18 +70,28 @@ router.put('/profile/username', (req, res)=>{
                             message: 'Profile tidak ditemukan'
                         })
                     } else {
-                        db.collection('users')
-                        .doc('/'+doc.docs[0].id+'/')
-                        .update({
-                            username: data.username
-                        })
-                        .then(()=>{
-                            req.session.username = data.username
-                            console.log('Username berhasil diupdate')
-                            return res.status(200).json({
-                                error: false,
-                                message: 'Username berhasil diupdate'
-                            })
+                        bycript.compare(data.password, doc.docs[0].data().password, (err, result)=>{
+                            if(result){
+                                db.collection('users')
+                                .doc('/'+doc.docs[0].id+'/')
+                                .update({
+                                    username: data.username
+                                })
+                                .then(()=>{
+                                    req.session.username = data.username
+                                    console.log('Username berhasil diupdate')
+                                    return res.status(200).json({
+                                        error: false,
+                                        message: 'Username berhasil diupdate'
+                                    })
+                                })
+                            } else {
+                                console.log('Password salah')
+                                return res.status(500).json({
+                                    error: true,
+                                    message: 'Password salah'
+                                })
+                            }
                         })
                     }
                 })
@@ -115,18 +134,29 @@ router.put('/profile/email', (req, res)=>{
                             message: 'Profile tidak ditemukan'
                         })
                     } else {
-                        db.collection('users')
-                        .doc('/'+doc.docs[0].id+'/')
-                        .update({
-                            email: data.email
-                        })
-                        .then(()=>{
-                            req.session.email = data.email
-                            console.log('Email berhasil diupdate')
-                            return res.status(200).json({
-                                error: false,
-                                message: 'Email berhasil diupdate'
-                            })
+                        // password validation
+                        bycript.compare(data.password, doc.docs[0].data().password, (err, result)=>{
+                            if(result){
+                                db.collection('users')
+                                .doc('/'+doc.docs[0].id+'/')
+                                .update({
+                                    email: data.email
+                                })
+                                .then(()=>{
+                                    req.session.email = data.email
+                                    console.log('Email berhasil diupdate')
+                                    return res.status(200).json({
+                                        error: false,
+                                        message: 'Email berhasil diupdate'
+                                    })
+                                })
+                            } else {
+                                console.log('Password salah')
+                                return res.status(500).json({
+                                    error: true,
+                                    message: 'Password salah'
+                                })
+                            }
                         })
                     }
                 })
@@ -210,6 +240,7 @@ router.put('/profile/password', (req, res)=>{
 // route for delete profile by session
 router.delete('/profile', (req, res)=>{
     session = req.session
+    var data = req.body
     if(session.uid){
         db.collection('users')
         .where('uid', '==', session.uid)
@@ -222,16 +253,27 @@ router.delete('/profile', (req, res)=>{
                     message: 'Profile tidak ditemukan'
                 })
             } else {
-                db.collection('users')
-                .doc('/'+doc.docs[0].id+'/')
-                .delete()
-                .then(()=>{
-                    req.session.destroy()
-                    console.log('Profile berhasil dihapus')
-                    return res.status(200).json({
-                        error: false,
-                        message: 'Profile berhasil dihapus'
-                    })
+                // password validation
+                bycript.compare(data.password, doc.docs[0].data().password, (err, result)=>{
+                    if(result){
+                        db.collection('users')
+                        .doc('/'+doc.docs[0].id+'/')
+                        .delete()
+                        .then(()=>{
+                            req.session.destroy()
+                            console.log('Profile berhasil dihapus')
+                            return res.status(200).json({
+                                error: false,
+                                message: 'Profile berhasil dihapus'
+                            })
+                        })
+                    } else {
+                        console.log('Password salah')
+                        return res.status(500).json({
+                            error: true,
+                            message: 'Password salah'
+                        })
+                    }
                 })
             }
         })
@@ -319,6 +361,95 @@ router.delete('/profile', (req, res)=>{
 //         })
 //     }
 // })
+
+// route for update profile photo by session
+router.put('/profile/photo', multer.single('photo'), imgUpload.uploadToGcs, (req, res)=>{
+    session = req.session
+    // console.log(req.file)
+    if(session.uid){
+        if(req.file && req.file.cloudStoragePublicUrl){
+            db.collection('users')
+            .where('uid', '==', session.uid)
+            .get()
+            .then((doc)=>{
+                if(doc.empty){
+                    console.log('Profile tidak ditemukan')
+                    return res.status(500).json({
+                        error: true,
+                        message: 'Profile tidak ditemukan'
+                    })
+                } else {
+                    db.collection('users')
+                    .doc('/'+doc.docs[0].id+'/')
+                    .update({
+                        image_url: req.file.cloudStoragePublicUrl
+                    })
+                    .then(()=>{
+                        req.session.image_url = req.file.cloudStoragePublicUrl
+                        console.log('Photo profile berhasil diupdate')
+                        return res.status(200).json({
+                            error: false,
+                            message: 'Photo profile berhasil diupdate'
+                        })
+                    })
+                }
+            })
+        } else {
+            console.log('Photo profile tidak ditemukan')
+            return res.status(500).json({
+                error: true,
+                message: 'Photo profile tidak ditemukan'
+            })
+        }
+    } else {
+        console.log('Profile tidak ditemukan')
+        return res.status(500).json({
+            error: true,
+            message: 'Profile tidak ditemukan'
+        })
+    }
+})
+
+// route for delete profile photo by session
+router.delete('/profile/photo', (req, res)=>{
+    session = req.session
+    if(session.uid){
+        db.collection('users')
+        .where('uid', '==', session.uid)
+        .get()
+        .then((doc)=>{
+            if(doc.empty){
+                console.log('Profile tidak ditemukan')
+                return res.status(500).json({
+                    error: true,
+                    message: 'Profile tidak ditemukan'
+                })
+            } else {
+                db.collection('users')
+                .doc('/'+doc.docs[0].id+'/')
+                .update({
+                    image_url: 'https://storage.googleapis.com/capstone-bangkit-bucket/Photo-Profile/dummy_photo_profile.png'
+                })
+                .then(()=>{
+                    imgUpload.deleteFromGcs(req.session.image_url.split('/').pop())
+                    req.session.image_url = 'https://storage.googleapis.com/capstone-bangkit-bucket/Photo-Profile/dummy_photo_profile.png'
+                    
+                    console.log('Photo profile berhasil dihapus')
+                    return res.status(200).json({
+                        error: false,
+                        message: 'Photo profile berhasil dihapus'
+                    })
+                })
+            }
+        })
+    } else {
+        console.log('Profile tidak ditemukan')
+        return res.status(500).json({
+            error: true,
+            message: 'Profile tidak ditemukan'
+        })
+    }
+})
 
 // export module
 module.exports = router;
