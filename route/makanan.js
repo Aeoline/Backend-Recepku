@@ -26,13 +26,12 @@ router.get('/makanan/all', (req, res)=>{
     })
 })
 
-// get makanan by title
-router.get('/makanan/:title', (req, res)=>{
-    var title = req.params.title
-    console.log(title)
+// get top 10 makanan by search record
+router.get('/makanan/top', (req, res)=>{
     var makanan = []
     db.collection('makanan')
-    .where('title', '==', title)
+    .orderBy('search_record', 'desc')
+    .limit(10)
     .get()
     .then((snapshot)=>{
         snapshot.forEach((doc)=>{
@@ -51,7 +50,6 @@ router.get('/makanan/:title', (req, res)=>{
     })
 })
 
-
 // get makanan by id
 router.get('/makanan/id/:id', (req, res)=>{
     var id = req.params.id
@@ -60,9 +58,44 @@ router.get('/makanan/id/:id', (req, res)=>{
     .doc(id)
     .get()
     .then((doc)=>{
+        // update search count
+        var search_record = doc.data().search_record
+        search_record++
+        db.collection('makanan')
+        .doc(id)
+        .update({
+            search_record: search_record
+        })
+
+        // return data
         res.status(200).json({
             message: 'success',
             data: doc.data()
+        })
+    })
+    .catch((err)=>{
+        res.status(500).json({
+            message: 'error',
+            data: err
+        })
+    })
+})
+
+// get makanan by title
+router.get('/makanan/:title', (req, res)=>{
+    var title = req.params.title
+    console.log(title)
+    var makanan = []
+    db.collection('makanan')
+    .where('title', '==', title)
+    .get()
+    .then((snapshot)=>{
+        snapshot.forEach((doc)=>{
+            makanan.push(doc.data())
+        })
+        res.status(200).json({
+            message: 'success',
+            data: makanan
         })
     })
     .catch((err)=>{
