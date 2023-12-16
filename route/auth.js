@@ -95,6 +95,7 @@ router.post('/register', (req, res)=>{
                                 'username': data.username,
                                 'password': data.password,
                                 'email': data.email,
+                                'image_url': 'https://storage.googleapis.com/capstone-bangkit-bucket/Photo-Profile/dummy_photo_profile.png',
                                 'created_on': convertTZ(new Date(), "Asia/Jakarta"),
                             })
                             .then(()=>{
@@ -187,6 +188,7 @@ router.post('/login', (req, res)=>{
                             req.session.uid = doc.docs[0].data().uid
                             req.session.username = doc.docs[0].data().username
                             req.session.email = doc.docs[0].data().email
+                            req.session.image_url = doc.docs[0].data().image_url
                             console.log('Welcome ' + req.session.username)
                             return res.status(200).json({
                                 error: false,
@@ -216,6 +218,7 @@ router.post('/login', (req, res)=>{
                     req.session.uid = doc.docs[0].data().uid
                     req.session.username = doc.docs[0].data().username
                     req.session.email = doc.docs[0].data().email
+                    req.session.image_url = doc.docs[0].data().image_url
                     console.log('Welcome ' + req.session.username)
                     return res.status(200).json({
                         error: false,
