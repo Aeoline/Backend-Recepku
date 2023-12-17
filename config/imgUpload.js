@@ -6,20 +6,20 @@ const path = require('path');
 
 const pathKey = path.resolve('./serviceaccountkey.json')
 
-// TODO: Sesuaikan konfigurasi Storage
+// Konfigurasi Storage
 const gcs = new Storage({
     projectId: 'capstone-bangkit01',
     keyFilename: pathKey
 })
 
-// TODO: Tambahkan nama bucket yang digunakan dan folder Foto-Profile di dalam bucket
+// Konfigurasi Bucket
 const bucketName = 'capstone-bangkit-bucket'
 const bucket = gcs.bucket(bucketName)
 
-// folder di dalam bucket
+// Folder di dalam bucket
 const folder = 'Photo-Profile'
 
-// fungsi untuk membuat nama file unik
+// Fungsi untuk membuat nama file unik
 function getPublicUrl(filename) {
     return `https://storage.googleapis.com/${bucketName}/${folder}/${filename}`
 }
@@ -52,7 +52,7 @@ ImgUpload.uploadToGcs = (req, res, next) => {
     stream.end(req.file.buffer)
 }
 
-// fungsi untuk menghapus file di Google Cloud Storage
+// Fungsi untuk menghapus file di Google Cloud Storage
 ImgUpload.deleteFromGcs = (filename) => {
     if (filename) {
         const file = bucket.file(`${folder}/${filename}`)
