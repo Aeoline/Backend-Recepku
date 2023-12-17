@@ -49,9 +49,6 @@ app.use(profile)
 // makanan route
 var makanan = require('./route/makanan')
 app.use(makanan)
-// //imgUpload route
-// var imgUpload = require('./model/imgUpload')
-// app.use(imgUpload)
 
 // server
 var port = process.env.PORT || 3000
