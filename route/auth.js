@@ -7,6 +7,9 @@ const { v4: uuidv4 } = require('uuid');
 router.use(bodyParser.json())
 router.use(bodyParser.urlencoded({extended: true}))
 
+const jwt = require('jsonwebtoken')
+const secretKey = 'MyLovelyYaeMiko'
+
 // timestamp
 db.settings({
     timestampsInSnapshots: true
@@ -167,7 +170,7 @@ router.get('/register', (req, res)=>{
     }
 })
 
-// route for login username or email and password with validation
+// route for login username or email and password with validation and save token
 router.post('/login', (req, res)=>{
     var data = req.body
     db.collection('users')
@@ -185,6 +188,12 @@ router.post('/login', (req, res)=>{
                 }else{
                     bycript.compare(data.password, doc.docs[0].data().password, (err, result)=>{
                         if(result){
+                            var token = jwt.sign({
+                                uid: doc.docs[0].data().uid,
+                                username: doc.docs[0].data().username,
+                                email: doc.docs[0].data().email,
+                                image_url: doc.docs[0].data().image_url
+                            }, secretKey, {expiresIn: '1h'})
                             req.session.uid = doc.docs[0].data().uid
                             req.session.username = doc.docs[0].data().username
                             req.session.email = doc.docs[0].data().email
@@ -193,7 +202,8 @@ router.post('/login', (req, res)=>{
                             return res.status(200).json({
                                 error: false,
                                 message: 'Welcome ' + req.session.username,
-                                data: req.session
+                                data: req.session,
+                                token: token
                             })
                         }else{
                             console.log('password salah')
@@ -215,6 +225,12 @@ router.post('/login', (req, res)=>{
         }else{
             bycript.compare(data.password, doc.docs[0].data().password, (err, result)=>{
                 if(result){
+                    var token = jwt.sign({
+                        uid: doc.docs[0].data().uid,
+                        username: doc.docs[0].data().username,
+                        email: doc.docs[0].data().email,
+                        image_url: doc.docs[0].data().image_url
+                    }, secretKey, { expiresIn: '1h' })
                     req.session.uid = doc.docs[0].data().uid
                     req.session.username = doc.docs[0].data().username
                     req.session.email = doc.docs[0].data().email
@@ -223,7 +239,8 @@ router.post('/login', (req, res)=>{
                     return res.status(200).json({
                         error: false,
                         message: 'Welcome ' + req.session.username,
-                        data: req.session
+                        data: req.session,
+                        token: token
                     })
                 }else{
                     console.log('password salah')
@@ -244,64 +261,46 @@ router.post('/login', (req, res)=>{
     })
 })
 
-// get login info
-router.get('/login', (req, res)=>{
-    session = req.session
-    if(session.username){
-        console.log(session)
-        return res.status(200).json({
-            error: false,
-            message: 'Authentication success',
-            data: session
-        })
-    }else{
-        console.log('Authentication failed the user is not logged in')
-        return res.status(500).json({
+// middleware for authentication token with jwt decoder
+function authenticateToken(req, res, next){
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[1]
+    console.log(token)
+    if(token == null){
+        return res.status(401).json({
             error: true,
-            message: 'Authentication failed the user is not logged in'
-
+            message: 'Unauthorized'
         })
     }
+    jwt.verify(token, secretKey, (err, user)=>{
+        console.log(jwt.decode(token))
+        if(err){
+            return res.status(403).json({
+                error: true,
+                message: 'Forbidden'
+            })
+        }
+        req.user = user
+        next()
+    })
+}
+
+// route for authenticated user by token without session
+router.get('/user', authenticateToken, (req, res)=>{
+    console.log(req.user)
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[1]
+
+    return res.status(200).json({
+        error: false,
+        message: 'Berhasil mendapatkan user',
+        data: req.user,
+        token: token
+    })
 })
 
-// route for authenticated user
-router.get('/user', (req, res)=>{
-    session = req.session
-    if(session.uid){
-        db.collection('users')
-        .where('uid', '==', session.uid)
-        .get()
-        .then((doc)=>{
-            if(doc.empty){
-                console.log('Tidak ada user')
-                return res.status(200).json({
-                    error: true,
-                    message: 'Tidak ada user'
-                })
-            }else{
-                var users = []
-                doc.forEach((doc)=>{
-                    users.push(doc.data())
-                })
-                console.log(users)
-                return res.status(200).json({
-                    error: false,
-                    message: 'Berhasil mendapatkan user',
-                    data: users
-                })
-            }
-        })
-    }else{
-        console.log('Authentication failed user is not logged in')
-        return res.status(500).json({
-            error: true,
-            message: 'Authentication failed user is not logged in'
-        })
-    }
-})
-
-// route for logout
-router.get('/logout', (req, res)=>{
+// route for logout with token
+router.get('/logout', authenticateToken, (req, res)=>{
     req.session.destroy((err)=>{
         if(err){
             console.log(err)
