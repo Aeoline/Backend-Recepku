@@ -109,41 +109,62 @@ router.get('/makanan/:title', (req, res)=>{
 // search makanan by likely parameter and limit
 router.get('/makanan', (req, res)=>{
     var search = req.query
-    console.log(search)
-    var key = Object.keys(search)
-    var value = Object.values(search)
-    value[0] = value[0].toLowerCase()
-    
-    var makanan = []
-    db.collection('makanan')
-    .where(key[0], '>=', value[0])
-    .where(key[0], '<=', value[0] + '\uf8ff')
-    .limit(10)
-    .get()
-    .then((snapshot)=>{
-        snapshot.forEach((doc)=>{
-            makanan.push(doc.data())
-            console.log(doc.data())
-        })
-        if (makanan.length == 0) {
-            res.status(200).json({
-                message: 'not found',
-                data: makanan
+    if (search.title == undefined) {
+        // get all makanan
+        var makanan = []
+        db.collection('makanan').get()
+        .then((snapshot)=>{
+            snapshot.forEach((doc)=>{
+                makanan.push(doc.data())
             })
-        }
-        else{
             res.status(200).json({
                 message: 'success',
                 data: makanan
             })
-        }
-    })
-    .catch((err)=>{
-        res.status(500).json({
-            message: 'error',
-            data: err
         })
-    })
+        .catch((err)=>{
+            res.status(500).json({
+                message: 'error',
+                data: err
+            })
+        })
+    } else {
+        console.log(search)
+        var key = Object.keys(search)
+        var value = Object.values(search)
+        value[0] = value[0].toLowerCase()
+        
+        var makanan = []
+        db.collection('makanan')
+        .where(key[0], '>=', value[0])
+        .where(key[0], '<=', value[0] + '\uf8ff')
+        .limit(10)
+        .get()
+        .then((snapshot)=>{
+            snapshot.forEach((doc)=>{
+                makanan.push(doc.data())
+                console.log(doc.data())
+            })
+            if (makanan.length == 0) {
+                res.status(200).json({
+                    message: 'not found',
+                    data: makanan
+                })
+            }
+            else{
+                res.status(200).json({
+                    message: 'success',
+                    data: makanan
+                })
+            }
+        })
+        .catch((err)=>{
+            res.status(500).json({
+                message: 'error',
+                data: err
+            })
+        })
+    }
 })
 
 // export router
