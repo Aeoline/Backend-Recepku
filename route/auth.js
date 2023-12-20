@@ -8,7 +8,7 @@ router.use(bodyParser.json())
 router.use(bodyParser.urlencoded({extended: true}))
 const jwt = require('jsonwebtoken')
 
-// middleware for authentication token with jwt decoder
+// middleware for authentication token with jason web token decoder
 const secretKey = 'MyLovelyYaeMiko'
 function authenticateToken(req, res, next){
     const authHeader = req.headers['authorization']
