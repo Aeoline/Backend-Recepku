@@ -81,7 +81,7 @@ router.get('/makanan/id/:id', (req, res)=>{
     })
 })
 
-// get makanan by title
+// get makanan by slug
 router.get('/makanan/:title', (req, res)=>{
     var title = req.params.title
     console.log(title)
@@ -109,7 +109,8 @@ router.get('/makanan/:title', (req, res)=>{
 // search makanan by likely parameter and limit
 router.get('/makanan', (req, res)=>{
     var search = req.query
-    if (search.title == undefined) {
+    console.log(search)
+    if (search.slug == undefined) {
         // get all makanan
         var makanan = []
         db.collection('makanan').get()
@@ -129,7 +130,6 @@ router.get('/makanan', (req, res)=>{
             })
         })
     } else {
-        console.log(search)
         var key = Object.keys(search)
         var value = Object.values(search)
         value[0] = value[0].toLowerCase()
