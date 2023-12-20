@@ -7,6 +7,33 @@ router.use(bodyParser.json())
 router.use(bodyParser.urlencoded({ extended: true }))
 const Multer = require('multer')
 
+// jwt
+const jwt = require('jsonwebtoken')
+const secretKey = 'MyLovelyYaeMiko'
+
+function authenticateToken(req, res, next){
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[1]
+    console.log(token)
+    if(token == null){
+        return res.status(401).json({
+            error: true,
+            message: 'Unauthorized'
+        })
+    }
+    jwt.verify(token, secretKey, (err, user)=>{
+        if(err){
+            return res.status(403).json({
+                error: true,
+                message: 'Forbidden'
+            })
+        }
+        req.user = user
+        next()
+    }
+)}
+
+
 // image upload
 const imgUpload = require('../config/imgUpload')
 
@@ -285,6 +312,82 @@ router.delete('/profile', (req, res)=>{
         })
     }
 })
+
+// // route for update profile by session with validation on duplicate username and email and confirmation password
+// router.put('/profile', (req, res)=>{
+//     session = req.session
+//     if(session.username){
+//         var data = req.body
+//         db.collection('users')
+//         .doc('/'+session.username+'/')
+//         .get()
+//         .then((doc)=>{
+//             if(doc.exists){
+//                 bycript.compare(data.password, doc.data().password, (err, result)=>{
+//                     if(result){
+//                         db.collection('users')
+//                         .where('username', '==', data.username)
+//                         .get()
+//                         .then((doc)=>{
+//                             if(doc.empty){
+//                                 db.collection('users')
+//                                 .where('email', '==', data.email)
+//                                 .get()
+//                                 .then((doc)=>{
+//                                     if(doc.empty){
+//                                         db.collection('users')
+//                                         .doc('/'+session.username+'/')
+//                                         .update({
+//                                             username: data.username,
+//                                             email: data.email
+//                                         })
+//                                         .then(()=>{
+//                                             console.log('Profile berhasil diupdate')
+//                                             return res.status(200).json({
+//                                                 error: false,
+//                                                 message: 'Profile berhasil diupdate'
+//                                             })
+//                                         })
+//                                     } else {
+//                                         console.log('Email sudah terdaftar')
+//                                         return res.status(500).json({
+//                                             error: true,
+//                                             message: 'Email sudah terdaftar'
+//                                         })
+//                                     }
+//                                 })
+//                             } else {
+//                                 console.log('Username sudah terdaftar')
+//                                 return res.status(500).json({
+//                                     error: true,
+//                                     message: 'Username sudah terdaftar'
+//                                 })
+//                             }
+//                         })
+//                     } else {
+//                         console.log('Password salah')
+//                         return res.status(500).json({
+//                             error: true,
+//                             message: 'Password salah'
+//                         })
+//                     }
+//                 })
+//             } else {
+//                 console.log('Profile tidak ditemukan')
+//                 return res.status(500).json({
+//                     error: true,
+//                     message: 'Profile tidak ditemukan'
+//                 })
+//             }
+//         })
+//     } else {
+//         console.log('Profile tidak ditemukan')
+//         return res.status(500).json({
+//             error: true,
+//             message: 'Profile tidak ditemukan'
+//         })
+//     }
+// })
 
 // route for update profile photo by session
 router.put('/profile/photo', multer.single('photo'), imgUpload.uploadToGcs, (req, res)=>{
