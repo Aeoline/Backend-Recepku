@@ -51,21 +51,13 @@ function authenticateToken(req, res, next){
 )}
 
 // routes
-app.get('/', authenticateToken, (req, res)=>{
-    session = req.session
-    if (session.uid) {
-        res.json({
-            message: 'Welcome ' + session.username,
-            data: session
-        })
-    }
-    else{
-        res.json({
-            message: 'Welcome guest',
-            data: session
-        })
-    }
+app.get('/', (req, res)=>{
+    res.send(
+        `<h1>API Documentation</h1>
+        <a href='https://docs.google.com/document/d/1-Z3QRKcvuMldz4tEcqZT_bRQESzZsLHPJX9pkVELbG4/edit?usp=sharing'>GDocs</a>`
+    )
 })
+
 // auth route
 var auth = require('./route/auth')
 app.use(auth)
@@ -75,9 +67,6 @@ app.use(profile)
 // makanan route
 var makanan = require('./route/makanan')
 app.use(makanan)
-// //imgUpload route
-// var imgUpload = require('./model/imgUpload')
-// app.use(imgUpload)
 
 // server
 var port = process.env.PORT || 3000
