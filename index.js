@@ -24,8 +24,34 @@ app.use(session({
 var cookieParser = require('cookie-parser')
 app.use(cookieParser());
 
+// jwt
+const jwt = require('jsonwebtoken')
+const secretKey = 'MyLovelyYaeMiko'
+
+function authenticateToken(req, res, next){
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[1]
+    console.log(token)
+    if(token == null){
+        return res.status(401).json({
+            error: true,
+            message: 'Unauthorized'
+        })
+    }
+    jwt.verify(token, secretKey, (err, user)=>{
+        if(err){
+            return res.status(403).json({
+                error: true,
+                message: 'Forbidden'
+            })
+        }
+        req.user = user
+        next()
+    }
+)}
+
 // routes
-app.get('/', (req, res)=>{
+app.get('/', authenticateToken, (req, res)=>{
     session = req.session
     if (session.uid) {
         res.json({
@@ -49,6 +75,9 @@ app.use(profile)
 // makanan route
 var makanan = require('./route/makanan')
 app.use(makanan)
+// //imgUpload route
+// var imgUpload = require('./model/imgUpload')
+// app.use(imgUpload)
 
 // server
 var port = process.env.PORT || 3000
