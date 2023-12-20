@@ -6,9 +6,32 @@ var db = fire.firestore()
 const { v4: uuidv4 } = require('uuid');
 router.use(bodyParser.json())
 router.use(bodyParser.urlencoded({extended: true}))
-
 const jwt = require('jsonwebtoken')
+
+// middleware for authentication token with jwt decoder
 const secretKey = 'MyLovelyYaeMiko'
+function authenticateToken(req, res, next){
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[1]
+    console.log(token)
+    if(token == null){
+        return res.status(401).json({
+            error: true,
+            message: 'Unauthorized'
+        })
+    }
+    jwt.verify(token, secretKey, (err, user)=>{
+        console.log(jwt.decode(token))
+        if(err){
+            return res.status(403).json({
+                error: true,
+                message: 'Forbidden'
+            })
+        }
+        req.user = user
+        next()
+    })
+}
 
 // timestamp
 db.settings({
@@ -150,7 +173,6 @@ router.post('/register', (req, res)=>{
     })
 })
 
-
 // route for get register info
 router.get('/register', (req, res)=>{
     session = req.session
@@ -261,30 +283,6 @@ router.post('/login', (req, res)=>{
     })
 })
 
-// middleware for authentication token with jwt decoder
-function authenticateToken(req, res, next){
-    const authHeader = req.headers['authorization']
-    const token = authHeader && authHeader.split(' ')[1]
-    console.log(token)
-    if(token == null){
-        return res.status(401).json({
-            error: true,
-            message: 'Unauthorized'
-        })
-    }
-    jwt.verify(token, secretKey, (err, user)=>{
-        console.log(jwt.decode(token))
-        if(err){
-            return res.status(403).json({
-                error: true,
-                message: 'Forbidden'
-            })
-        }
-        req.user = user
-        next()
-    })
-}
-
 // route for authenticated user by token without session
 router.get('/user', authenticateToken, (req, res)=>{
     console.log(req.user)
@@ -306,7 +304,11 @@ router.get('/logout', authenticateToken, (req, res)=>{
             console.log(err)
         }else{
             console.log('Logout berhasil')
-            res.redirect('/')
+            req.user = null
+            return res.status(200).json({
+                error: false,
+                message: 'Logout berhasil'
+            })
         }
     })
 })
