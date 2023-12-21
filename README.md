@@ -49,5 +49,5 @@ View the API documentation at
   $ docker run -d --name cc-api -e NODE_ENV=production -e MIGRATE=1 -e HOST=0.0.0.0 -e PORT=5000 -e DB_HOST=172.17.0.7 -e DB_USERNAME=username -e DB_PASSWORD=secretpass -e DB_DATABASE=my_db -e DB_DIALECT=postgres -e MEMCACHIER_SERVERS=172.17.0.8 -e ACCESS_TOKEN_AGE=900 -e ACCESS_TOKEN_KEY=nmcd8sajdsa8 -e REFRESH_TOKEN_KEY=mcd9aidmacid -e ML_API=http://ml-api.com -p 5000:5000 c22-ps234-cc-api:latest
   ```
 
-6) View the API documentation at
-[http://localhost:5000/docs](http://localhost:5000/docs)
+6) View the API documentation in GDocs at
+[[http://localhost:5000/docs](https://backend-dot-capstone-bangkit01.et.r.appspot.com/)https://backend-dot-capstone-bangkit01.et.r.appspot.com/]([http://localhost:5000/docs](https://backend-dot-capstone-bangkit01.et.r.appspot.com/)https://backend-dot-capstone-bangkit01.et.r.appspot.com/)
