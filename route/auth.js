@@ -283,6 +283,25 @@ router.post('/login', (req, res)=>{
     })
 })
 
+//route for get login info
+router.get('/login', (req, res)=>{
+    session = req.session
+    if(session.username){
+        console.log(session)
+        return res.status(200).json({
+            error: false,
+            message: 'Login berhasil',
+            data: session
+        })
+    }else{
+        console.log('Not Found')
+        return res.status(200).json({
+            error: true,
+            message: 'Not Found'
+        })
+    }
+})
+
 // route for authenticated user by token without session
 router.get('/user', authenticateToken, (req, res)=>{
     console.log(req.user)
