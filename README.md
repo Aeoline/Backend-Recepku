@@ -50,4 +50,4 @@ View the API documentation at
   ```
 
 6) View the API documentation in GDocs at
-[[http://localhost:5000/docs](https://backend-dot-capstone-bangkit01.et.r.appspot.com/)https://backend-dot-capstone-bangkit01.et.r.appspot.com/]([http://localhost:5000/docs](https://backend-dot-capstone-bangkit01.et.r.appspot.com/)https://backend-dot-capstone-bangkit01.et.r.appspot.com/)
+[[http://localhost:5000/docs](https://backend-dot-capstone-bangkit01.et.r.appspot.com/)https://backend-dot-capstone-bangkit01.et.r.appspot.com/]([http://localhost:5000/docs]
