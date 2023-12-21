@@ -488,27 +488,39 @@ router.delete('/profile', authenticateToken, (req, res)=>{
                 message: 'Profile tidak ditemukan'
             })
         } else {
-            bycript.compare(req.body.password, doc.docs[0].data().password, (err, result)=>{
-                if(result){
-                    db.collection('users')
-                    .doc('/'+doc.docs[0].id+'/')
-                    .delete()
-                    .then(()=>{
-                        // delete token
-                        req.user = null
-                        console.log('Profile berhasil dihapus')
-                        return res.status(200).json({
-                            error: false,
-                            message: 'Profile berhasil dihapus'
-                        })
-                    })
-                } else {
-                    console.log('Password salah')
-                    return res.status(500).json({
-                        error: true,
-                        message: 'Password salah'
-                    })
-                }
+            db.collection('users')
+            .doc('/'+doc.docs[0].id+'/')
+            .delete()
+            .then(()=>{
+                // delete token
+                req.user = null
+                console.log('Profile berhasil dihapus')
+                return res.status(200).json({
+                    error: false,
+                    message: 'Profile berhasil dihapus'
+                })
+            // bycript.compare(req.body.password, doc.docs[0].data().password, (err, result)=>{
+            //     if(result){
+            //         db.collection('users')
+            //         .doc('/'+doc.docs[0].id+'/')
+            //         .delete()
+            //         .then(()=>{
+            //             // delete token
+            //             req.user = null
+            //             console.log('Profile berhasil dihapus')
+            //             return res.status(200).json({
+            //                 error: false,
+            //                 message: 'Profile berhasil dihapus'
+            //             })
+            //         })
+            //     } 
+                // else {
+                //     console.log('Password salah')
+                //     return res.status(500).json({
+                //         error: true,
+                //         message: 'Password salah'
+                //     })
+                // }
             })
         }
     })
