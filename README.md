@@ -31,7 +31,7 @@ Recepku-API project is part of the Recepku application. This is an API build wit
 * Json Web Token
 * Multer
 * Nodemon
-   Uuid
+* uuid
 
 ## Installation
 ### Pull image from Docker HUB
