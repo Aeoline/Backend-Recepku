@@ -18,20 +18,20 @@ Recepku-API project is part of the Recepku application. This is an API build wit
 * .env (environment file)
 
 ## Library
-*"@google-cloud/debug-agent",
-*"@google-cloud/storage",
-*"bcryptjs",
-*"body-parser",
-*"cookie-parse,
-*"cors",
-*"dateformat",
-*"express",
-*"express-session",
-*"firebase-admin",
-*"jsonwebtoken",
-*"multer",
-*"nodemon",
-*"uuid"
+*Google Cloud / Debug Agent
+*Google Cloud / Storage
+*Bcrypt js
+*Body Parser
+*Cookie Parse
+*Cors
+*Dateformat
+*Express
+*Express Session
+*Firebase Admin
+*Json Web Token
+*Multer
+*Nodemon
+*uuid
 
 ## Installation
 ### Pull image from Docker HUB
