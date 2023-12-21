@@ -17,6 +17,9 @@ Recepku-API project is part of the Recepku application. This is an API build wit
   * **profile.js**
 * .env (environment file)
 
+## Architecture Design
+![image.png](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEidH91dFuECvJ-bwwq4JEsViuTJH9048U4zRPwoeRDCU_kGRv768twV5KQYSJGgBfKa7vqIkK_sraAY71WI2OAfyUb2AfLJrjaDeRzd_WBlIppJuOWEZvA3_S5tWVLpAuGW0oGQH14rr67v7aaGW6N02NYVo-PeT3I6IrULUHBpC5oA2PWTliymeKhGAwDf/w945-h600-p-k-no-nu/Screenshot%202023-12-21%20094309.png)
+
 ## Library
 * Google Cloud / Debug Agent
 * Google Cloud / Storage
