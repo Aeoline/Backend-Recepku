@@ -18,19 +18,19 @@ Recepku-API project is part of the Recepku application. This is an API build wit
 * .env (environment file)
 
 ## Library
-*Google Cloud / Debug Agent
-*Google Cloud / Storage
-*Bcrypt js
-*Body Parser
-*Cookie Parse
-*Cors
-*Dateformat
-*Express
-*Express Session
-*Firebase Admin
-*Json Web Token
-*Multer
-*Nodemon
+* Google Cloud / Debug Agent
+* Google Cloud / Storage
+* Bcrypt js
+* Body Parser
+* Cookie Parse
+* Cors
+* Dateformat
+* Express
+* Express Session
+* Firebase Admin
+* Json Web Token
+* Multer
+* Nodemon
 *uuid
 
 ## Installation
