@@ -365,5 +365,5 @@ router.get('/users', (req, res)=>{
     })
 })
 
-// export module
+// export router
 module.exports = router;
