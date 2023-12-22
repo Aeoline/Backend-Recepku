@@ -6,13 +6,13 @@ const path = require('path');
 
 const pathKey = path.resolve('./serviceaccountkey.json')
 
-// TODO: Sesuaikan konfigurasi Storage
+// fonfigurasi Storage
 const gcs = new Storage({
     projectId: 'capstone-bangkit01',
     keyFilename: pathKey
 })
 
-// TODO: Tambahkan nama bucket yang digunakan dan folder Foto-Profile di dalam bucket
+// fonfigurasi Bucket
 const bucketName = 'capstone-bangkit-bucket'
 const bucket = gcs.bucket(bucketName)
 
