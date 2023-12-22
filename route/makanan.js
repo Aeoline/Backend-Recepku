@@ -26,7 +26,7 @@ router.get('/makanan/all', (req, res)=>{
     })
 })
 
-// get top 10 makanan by search record
+// get topm makanan by search record
 router.get('/makanan/top', (req, res)=>{
     var makanan = []
     db.collection('makanan')
