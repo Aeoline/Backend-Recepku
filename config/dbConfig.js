@@ -6,4 +6,5 @@ fire.initializeApp({
   credential: fire.credential.cert(serviceAccount)
 });
 
+//export module
 module.exports = fire;
