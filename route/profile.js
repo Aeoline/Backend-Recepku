@@ -103,7 +103,7 @@ router.put('/profile/username', authenticateToken, (req, res)=>{
                                     username: data.username, 
                                     email: doc.docs[0].data().email, 
                                     image_url: doc.docs[0].data().image_url
-                                }, secretKey)
+                                }, secretKey, {expiresIn: '1h'})
                                 req.user = jwt.verify(token, secretKey)
 
                                 console.log('Username berhasil diupdate')
@@ -168,7 +168,7 @@ router.put('/profile/email', authenticateToken, (req, res)=>{
                                     username: doc.docs[0].data().username, 
                                     email: data.email, 
                                     image_url: doc.docs[0].data().image_url
-                                }, secretKey)
+                                }, secretKey, {expiresIn: '1h'})
                                 req.user = jwt.verify(token, secretKey)
 
                                 console.log('Email berhasil diupdate')
@@ -311,7 +311,7 @@ router.put('/profile/photo', authenticateToken, multer.single('photo'), imgUploa
                         username: doc.docs[0].data().username, 
                         email: doc.docs[0].data().email, 
                         image_url: req.file.cloudStoragePublicUrl
-                    }, secretKey)
+                    }, secretKey, {expiresIn: '1h'})
                     req.user = jwt.verify(token, secretKey)
 
                     console.log('Photo profile berhasil diupdate')
@@ -346,32 +346,41 @@ router.delete('/profile/photo', authenticateToken, (req, res)=>{
                 message: 'Profile tidak ditemukan'
             })
         } else {
-            db.collection('users')
-            .doc('/'+doc.docs[0].id+'/')
-            .update({
-                image_url: 'https://storage.googleapis.com/capstone-bangkit-bucket/Photo-Profile/dummy_photo_profile.png'
-            })
-            .then(()=>{
-                imgUpload.deleteFromGcs(req.user.image_url.split('/').pop())
-                req.user.image_url = 'https://storage.googleapis.com/capstone-bangkit-bucket/Photo-Profile/dummy_photo_profile.png'
-                
-                // update token
-                var token = jwt.sign({
-                    uid: doc.docs[0].data().uid, 
-                    username: doc.docs[0].data().username, 
-                    email: doc.docs[0].data().email, 
-                    image_url: req.user.image_url
-                }, secretKey)
-                req.user = jwt.verify(token, secretKey)
-
-                console.log('Photo profile berhasil dihapus')
-                return res.status(200).json({
-                    error: false,
-                    message: 'Photo profile berhasil dihapus',
-                    data: req.user,
-                    token: token
+            if (req.user.image_url != 'https://storage.googleapis.com/capstone-bangkit-bucket/Photo-Profile/dummy_photo_profile.png'){
+                console.log(req.user.image_url.split('/').pop())
+                db.collection('users')
+                .doc('/'+doc.docs[0].id+'/')
+                .update({
+                    image_url: 'https://storage.googleapis.com/capstone-bangkit-bucket/Photo-Profile/dummy_photo_profile.png'
                 })
-            })
+                .then(()=>{
+                    // delete photo from gcs
+                    imgUpload.deleteFromGcs(req.user.image_url.split('/').pop())
+
+                    // update token
+                    var token = jwt.sign({
+                        uid: doc.docs[0].data().uid, 
+                        username: doc.docs[0].data().username, 
+                        email: doc.docs[0].data().email, 
+                        image_url: 'https://storage.googleapis.com/capstone-bangkit-bucket/Photo-Profile/dummy_photo_profile.png'
+                    }, secretKey, {expiresIn: '1h'})
+                    req.user = jwt.verify(token, secretKey)
+
+                    console.log('Photo profile berhasil dihapus')
+                    return res.status(200).json({
+                        error: false,
+                        message: 'Photo profile berhasil dihapus',
+                        data: req.user,
+                        token: token
+                    })
+                })
+            } else {
+                console.log('Photo profile tidak ditemukan')
+                return res.status(500).json({
+                    error: true,
+                    message: 'Photo profile tidak ditemukan'
+                })
+            }
         }
     })
 })
