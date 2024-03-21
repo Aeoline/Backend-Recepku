@@ -1,9 +1,9 @@
 var fire = require("firebase-admin");
 
-var serviceAccount = require("../db-recepku-firebase-adminsdk-s0rfd-b74bc2e22e.json");
+var serviceAccount = require("../serviceaccountkey.json");
 
 fire.initializeApp({
-  credential: fire.credential.cert(serviceAccount)
+  credential: fire.credential.cert(serviceAccount),
 });
 
 //export module

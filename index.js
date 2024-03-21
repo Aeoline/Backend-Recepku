@@ -68,8 +68,12 @@ app.use(profile)
 var makanan = require('./route/makanan')
 app.use(makanan)
 
+//seeder_makanan route
+var seeder_makanan = require('./route/seeder_makanan')
+app.use(seeder_makanan)
+
 // server
-var port = process.env.PORT || 3000
+var port = process.env.PORT || 3001
 app.listen(port, ()=>{
     console.log('Server berjalan di port ' + port)
 })

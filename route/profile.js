@@ -385,5 +385,35 @@ router.delete('/profile/photo', authenticateToken, (req, res)=>{
     })
 })
 
+//Search Without Token
+router.get('/profile', (req, res) => {
+    db.collection('users')
+      .where('uid', '==', req.user.uid)
+      .get()
+      .then((snapshot) => {
+        if (snapshot.empty) {
+          console.log('Profile tidak ditemukan');
+          return res.status(500).json({
+            error: true,
+            message: 'Profile tidak ditemukan',
+          });
+        } else {
+          console.log('Profile ditemukan');
+          return res.status(200).json({
+            error: false,
+            message: 'Profile ditemukan',
+            data: snapshot.docs[0].data(),
+          });
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        return res.status(500).json({
+          error: true,
+          message: error,
+        });
+      });
+  });
+
 // export module
 module.exports = router;
