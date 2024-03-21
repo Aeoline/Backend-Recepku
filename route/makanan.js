@@ -225,7 +225,7 @@ router.post("/makanan", (req, res) => {
     });
 });
 
-// Route for Delete Recipe
+// Route for Delete Makanan
 router.delete("/makanan/:id", async (req, res) => {
   const { id } = req.params;
 
@@ -254,7 +254,41 @@ router.delete("/makanan/:id", async (req, res) => {
   }
 });
 
+// Route for updating makanan
+router.put("/makanan/:id", (req, res) => {
+  const makananId = req.params.id;
+  const updatedData = req.body;
 
+  // Update recipe in database
+  db.collection("makanan")
+    .doc(makananId)
+    .update({
+      title: updatedData.title,
+      slug: updatedData.slug,
+      description: updatedData.description,
+      calories: updatedData.calories,
+      healthyCalories: updatedData.healthyCalories,
+      ingredients: updatedData.ingredients,
+      healthyIngredients: updatedData.healthyIngredients,
+      steps: updatedData.steps,
+      healthySteps: updatedData.healthySteps,
+      photoUrl: updatedData.photoUrl,
+    })
+    .then(() => {
+      console.log("Resep berhasil diperbarui");
+      return res.status(200).json({
+        error: false,
+        message: "Resep berhasil diperbarui",
+      });
+    })
+    .catch((error) => {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: error,
+      });
+    });
+});
 
 // export router
 module.exports = router;
