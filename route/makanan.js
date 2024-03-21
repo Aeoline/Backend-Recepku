@@ -225,6 +225,35 @@ router.post("/makanan", (req, res) => {
     });
 });
 
+// Route for Delete Recipe
+router.delete("/makanan/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const docRef = db.collection("makanan").doc(id);
+    const makanan = await docRef.get();
+
+    if (!makanan.exists) {
+      return res.status(404).json({
+        success: false,
+        message: "Makanan not found",
+      });
+    }
+
+    await docRef.delete();
+
+    res.status(200).json({
+      success: true,
+      message: "Delete makanan successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
 
 
 // export router
